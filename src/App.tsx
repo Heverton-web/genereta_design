@@ -22,7 +22,7 @@ interface DesignState {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('branding');
+  const [activeTab, setActiveTab] = useState<Tab>('json');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedLog, setGeneratedLog] = useState<string | null>(null);
   
@@ -154,12 +154,12 @@ Grid: 12 Colunas (Gutter: 20px)
         {/* Sidebar Controls */}
         <aside className="w-80 border-r border-white/10 bg-[#0a0a0a] flex flex-col z-10">
           <div className="flex flex-col p-4 gap-2 border-b border-white/10">
-            <TabButton active={activeTab === 'branding'} onClick={() => setActiveTab('branding')} icon={<Palette className="w-4 h-4" />} label="1. Branding" />
-            <TabButton active={activeTab === 'elementos'} onClick={() => setActiveTab('elementos')} icon={<ImageIcon className="w-4 h-4" />} label="2. Elementos" />
-            <TabButton active={activeTab === 'informacoes'} onClick={() => setActiveTab('informacoes')} icon={<Type className="w-4 h-4" />} label="3. Informações" />
-            <TabButton active={activeTab === 'diagramacao'} onClick={() => setActiveTab('diagramacao')} icon={<LayoutGrid className="w-4 h-4" />} label="4. Diagramação" />
-            <TabButton active={activeTab === 'referencias'} onClick={() => setActiveTab('referencias')} icon={<Lightbulb className="w-4 h-4" />} label="5. Referências" />
-            <TabButton active={activeTab === 'json'} onClick={() => setActiveTab('json')} icon={<Code className="w-4 h-4" />} label="6. Motor JSON" />
+            <TabButton active={activeTab === 'json'} onClick={() => setActiveTab('json')} icon={<Code className="w-4 h-4" />} label="1. Motor JSON" />
+            <TabButton active={activeTab === 'branding'} onClick={() => setActiveTab('branding')} icon={<Palette className="w-4 h-4" />} label="2. Branding" />
+            <TabButton active={activeTab === 'elementos'} onClick={() => setActiveTab('elementos')} icon={<ImageIcon className="w-4 h-4" />} label="3. Elementos" />
+            <TabButton active={activeTab === 'informacoes'} onClick={() => setActiveTab('informacoes')} icon={<Type className="w-4 h-4" />} label="4. Informações" />
+            <TabButton active={activeTab === 'diagramacao'} onClick={() => setActiveTab('diagramacao')} icon={<LayoutGrid className="w-4 h-4" />} label="5. Diagramação" />
+            <TabButton active={activeTab === 'referencias'} onClick={() => setActiveTab('referencias')} icon={<Lightbulb className="w-4 h-4" />} label="6. Referências" />
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
@@ -172,6 +172,30 @@ Grid: 12 Colunas (Gutter: 20px)
                 transition={{ duration: 0.2 }}
                 className="flex flex-col gap-6"
               >
+                {activeTab === 'json' && (
+                  <div className="space-y-6">
+                    <ControlGroup label="Motor de Renderização (JSON)">
+                      <div className="space-y-4">
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          Cole o JSON com os parâmetros de design. O motor aplicará automaticamente o gradiente dourado, rim light e caminhos do repositório Heverton-web/materials.
+                        </p>
+                        <textarea 
+                          value={jsonInput}
+                          onChange={(e) => setJsonInput(e.target.value)}
+                          className="w-full bg-[#050505] border border-white/10 rounded px-3 py-3 text-xs font-mono text-emerald-400 min-h-[300px] custom-scrollbar"
+                          spellCheck={false}
+                        />
+                        <button 
+                          onClick={handleJsonImport}
+                          className="w-full bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded text-xs font-bold tracking-wider uppercase transition-colors"
+                        >
+                          Renderizar JSON
+                        </button>
+                      </div>
+                    </ControlGroup>
+                  </div>
+                )}
+
                 {activeTab === 'branding' && (
                   <div className="space-y-6">
                     <ControlGroup label="Cores Institucionais">
@@ -380,29 +404,6 @@ Grid: 12 Colunas (Gutter: 20px)
                           </div>
                           <span className="text-sm text-white/80 group-hover:text-white">Balanço de Branco Frio (Golden Standard)</span>
                         </label>
-                      </div>
-                    </ControlGroup>
-                  </div>
-                )}
-                {activeTab === 'json' && (
-                  <div className="space-y-6">
-                    <ControlGroup label="Motor de Renderização (JSON)">
-                      <div className="space-y-4">
-                        <p className="text-xs text-white/60 leading-relaxed">
-                          Cole o JSON com os parâmetros de design. O motor aplicará automaticamente o gradiente dourado, rim light e caminhos do repositório Heverton-web/materials.
-                        </p>
-                        <textarea 
-                          value={jsonInput}
-                          onChange={(e) => setJsonInput(e.target.value)}
-                          className="w-full bg-[#050505] border border-white/10 rounded px-3 py-3 text-xs font-mono text-emerald-400 min-h-[300px] custom-scrollbar"
-                          spellCheck={false}
-                        />
-                        <button 
-                          onClick={handleJsonImport}
-                          className="w-full bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded text-xs font-bold tracking-wider uppercase transition-colors"
-                        >
-                          Renderizar JSON
-                        </button>
                       </div>
                     </ControlGroup>
                   </div>
