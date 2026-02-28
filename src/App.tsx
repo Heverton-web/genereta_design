@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Palette, Image as ImageIcon, Type, LayoutGrid, Lightbulb, Download, Code, Sparkles, ChevronRight, Sliders, Layers, MonitorPlay } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-type Tab = 'branding' | 'elementos' | 'informacoes' | 'diagramacao' | 'referencias';
+type Tab = 'branding' | 'elementos' | 'informacoes' | 'diagramacao' | 'referencias' | 'json';
 
 interface DesignState {
   primaryColor: string;
@@ -12,6 +12,7 @@ interface DesignState {
   sharpness: number;
   blur: number;
   title: string;
+  highlightText: string;
   subtitle: string;
   ctaText: string;
   leftMargin: number;
@@ -29,10 +30,11 @@ export default function App() {
     primaryColor: '#0a192f', // Azul Marinho
     secondaryColor: '#d4af37', // Dourado
     fontFamily: 'Montserrat',
-    implantImage: '', // Placeholder
+    implantImage: 'https://raw.githubusercontent.com/Heverton-web/materials/main/implants/cone-morse.png', // Default API path
     sharpness: 60,
     blur: 15,
-    title: 'PRECISÃO EM CADA DETALHE',
+    title: 'PRECISÃO EM CADA',
+    highlightText: 'DETALHE',
     subtitle: 'A evolução da implantodontia com a tecnologia Conexão Implantes.',
     ctaText: 'CONHEÇA A LINHA',
     leftMargin: 15,
@@ -40,6 +42,22 @@ export default function App() {
     rimLight: true,
     coldBalance: true,
   });
+
+  const [jsonInput, setJsonInput] = useState<string>('');
+
+  useEffect(() => {
+    setJsonInput(JSON.stringify(design, null, 2));
+  }, [design]);
+
+  const handleJsonImport = () => {
+    try {
+      const parsed = JSON.parse(jsonInput);
+      setDesign(prev => ({ ...prev, ...parsed }));
+      alert('JSON importado com sucesso!');
+    } catch (e) {
+      alert('Erro ao fazer parse do JSON. Verifique a sintaxe.');
+    }
+  };
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -141,6 +159,7 @@ Grid: 12 Colunas (Gutter: 20px)
             <TabButton active={activeTab === 'informacoes'} onClick={() => setActiveTab('informacoes')} icon={<Type className="w-4 h-4" />} label="3. Informações" />
             <TabButton active={activeTab === 'diagramacao'} onClick={() => setActiveTab('diagramacao')} icon={<LayoutGrid className="w-4 h-4" />} label="4. Diagramação" />
             <TabButton active={activeTab === 'referencias'} onClick={() => setActiveTab('referencias')} icon={<Lightbulb className="w-4 h-4" />} label="5. Referências" />
+            <TabButton active={activeTab === 'json'} onClick={() => setActiveTab('json')} icon={<Code className="w-4 h-4" />} label="6. Motor JSON" />
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
@@ -264,11 +283,20 @@ Grid: 12 Colunas (Gutter: 20px)
                     <ControlGroup label="Conteúdo Textual">
                       <div className="space-y-4">
                         <div>
-                          <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Título (Bold)</label>
+                          <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Título (Branco)</label>
                           <textarea 
                             value={design.title}
                             onChange={(e) => updateDesign('title', e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-sm min-h-[80px]"
+                            className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-sm min-h-[60px]"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-white/50 uppercase tracking-wider mb-2 block">Destaque (Gradiente Dourado)</label>
+                          <input 
+                            type="text"
+                            value={design.highlightText}
+                            onChange={(e) => updateDesign('highlightText', e.target.value)}
+                            className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-sm"
                           />
                         </div>
                         <div>
@@ -356,6 +384,29 @@ Grid: 12 Colunas (Gutter: 20px)
                     </ControlGroup>
                   </div>
                 )}
+                {activeTab === 'json' && (
+                  <div className="space-y-6">
+                    <ControlGroup label="Motor de Renderização (JSON)">
+                      <div className="space-y-4">
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          Cole o JSON com os parâmetros de design. O motor aplicará automaticamente o gradiente dourado, rim light e caminhos do repositório Heverton-web/materials.
+                        </p>
+                        <textarea 
+                          value={jsonInput}
+                          onChange={(e) => setJsonInput(e.target.value)}
+                          className="w-full bg-[#050505] border border-white/10 rounded px-3 py-3 text-xs font-mono text-emerald-400 min-h-[300px] custom-scrollbar"
+                          spellCheck={false}
+                        />
+                        <button 
+                          onClick={handleJsonImport}
+                          className="w-full bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded text-xs font-bold tracking-wider uppercase transition-colors"
+                        >
+                          Renderizar JSON
+                        </button>
+                      </div>
+                    </ControlGroup>
+                  </div>
+                )}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -439,10 +490,21 @@ Grid: 12 Colunas (Gutter: 20px)
                   >
                     <motion.h1 
                       layout
-                      className="text-5xl lg:text-6xl font-bold leading-tight text-white mb-6"
+                      className="text-5xl lg:text-6xl font-bold leading-tight text-white mb-6 flex flex-col gap-2"
                       style={{ textShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
                     >
-                      {design.title}
+                      <span>{design.title}</span>
+                      {design.highlightText && (
+                        <span 
+                          className="text-transparent bg-clip-text bg-gradient-to-r"
+                          style={{ 
+                            backgroundImage: `linear-gradient(to right, ${design.secondaryColor}, #fff8d6, ${design.secondaryColor})`,
+                            textShadow: 'none'
+                          }}
+                        >
+                          {design.highlightText}
+                        </span>
+                      )}
                     </motion.h1>
                     <motion.p 
                       layout
